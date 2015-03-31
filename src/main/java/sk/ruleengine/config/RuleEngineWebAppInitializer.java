@@ -7,7 +7,7 @@ public class RuleEngineWebAppInitializer extends
 
 	@Override
 	protected Class<?>[] getRootConfigClasses() {
-		return new Class<?>[] { RootConfig.class, Neo4JConfig.class };
+		return new Class<?>[] { RootConfig.class };
 	}
 
 	@Override

@@ -2,7 +2,7 @@ package sk.ruleengine.config;
 
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
-public class SpittrWebAppInitializer extends
+public class RuleEngineWebAppInitializer extends
 		AbstractAnnotationConfigDispatcherServletInitializer {
 
 	@Override
@@ -17,7 +17,6 @@ public class SpittrWebAppInitializer extends
 
 	@Override
 	protected String[] getServletMappings() {
-		System.out.println("RuleEngine: GET Servlet Mappings");
 		return new String[] { "/*" };
 	}
 

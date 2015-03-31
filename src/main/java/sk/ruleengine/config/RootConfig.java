@@ -28,8 +28,6 @@ public class RootConfig {
 	
 	@Bean
 	String ruleModuleRestUrl() {
-		System.out.println("RULE Module STR");
-		//return "aaaaa";
 		return environment.getProperty("rulemodule.rulemodule1.uri");
 	}
 
@@ -45,6 +43,7 @@ public class RootConfig {
 
 	@Bean
 	public static PropertySourcesPlaceholderConfigurer placeholderConfigurer() {
+		PropertySourcesPlaceholderConfigurer conf = new PropertySourcesPlaceholderConfigurer();
 		return new PropertySourcesPlaceholderConfigurer();
 	}
 }

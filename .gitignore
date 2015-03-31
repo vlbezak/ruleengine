@@ -1,0 +1,8 @@
+.classpath
+bin/
+.gradle/
+.settings/gradle/org.springsource.ide.eclipse.gradle.core.import.prefs
+.project
+.settings/
+build/classes/main/sk/ruleengine/NEO4JObjectGenerator.class
+build/

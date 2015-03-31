@@ -32,7 +32,7 @@ public class RuleModuleRestController {
 	@Autowired
 	GraphDatabase graphDatabase;
 
-	@RequestMapping(value = "/cmdb99", method = RequestMethod.POST, produces = { MediaType.APPLICATION_JSON_VALUE }, consumes = { MediaType.APPLICATION_JSON_VALUE })
+	@RequestMapping(value = "/cmdb", method = RequestMethod.POST, produces = { MediaType.APPLICATION_JSON_VALUE }, consumes = { MediaType.APPLICATION_JSON_VALUE })
 	public @ResponseBody String storeObjects(
 			@RequestBody String cypherStatement, HttpServletResponse response) {
 		System.out.println("RuleEngine: REST: received cypherStatement:"

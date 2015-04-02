@@ -1,6 +1,8 @@
 package sk.ruleengine.web.rest;
 
+import java.io.Serializable;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -22,20 +24,30 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import sk.ruleengine.beans.CypherError;
+import sk.ruleengine.beans.CypherRequest;
+import sk.ruleengine.beans.CypherResponse;
+import sk.ruleengine.beans.CypherStatement;
+import sk.ruleengine.beans.CypherTransaction;
+import sk.ruleengine.beans.Transaction;
+import sk.ruleengine.service.Neo4jTransactionalService;
 import sk.ruleengine.service.RuleModuleClientService;
 
 @Controller
 @RequestMapping("/ruleprocessor")
 public class RuleModuleRestController {
 
+	private static final String BASE_NEO4J_URL = "http://localhost:7474/db/data/transaction";
+	
 	@Autowired
 	RuleModuleClientService ruleModuleClientService;
-
+	
 	@Autowired
-	@Qualifier("neo4jRestTemplate")
-	RestTemplate restTemplate;
-	
-	
+	Neo4jTransactionalService neo4jTransactionalService;
+
 	@RequestMapping(value = "/cmdb", method = RequestMethod.POST, produces = { MediaType.APPLICATION_JSON_VALUE }, consumes = { MediaType.APPLICATION_JSON_VALUE })
 	public @ResponseBody String storeObjects(@RequestBody String cypherStatement, HttpServletResponse response) {
 		System.out.println("RuleEngine: REST: received cypherStatement:"
@@ -47,44 +59,33 @@ public class RuleModuleRestController {
 		long transFinishTime;
 		int ruleCount = 1;
 		
-		
-		URI location = restTemplate.postForLocation("http://localhost:7474/db/data/transaction", "", new HashMap<String, String>());
-		
-		String[] pathList = location.getPath().split("\\/");
-		String transactionId =pathList[pathList.length-1];
-		
-		
-		System.out.println("XXX location: " + location + " trId: " + transactionId);
+		Transaction transaction = null;
 		
 		try 
 		{
-			for (int i = 0; i < ruleCount; i++) {
-				
-				String cypherQuery = ruleModuleClientService
-						.getRuleToCheck("dummy");
-				System.out
-						.println("RuleEngine: REST: called ruleModule. returned rule:"
-								+ cypherQuery);
+			transaction = neo4jTransactionalService.startTransaction();
+			
+			String cypherQuery = "match (n) return n, n.name";
+			String cypherQuery2 = "match ()-[r]-() return type(r)";
+			System.out.println("RuleEngine: REST: called ruleModule. returned rule:" + cypherQuery);
+			
+			CypherResponse result = neo4jTransactionalService.runQuery(transaction, Arrays.asList(cypherQuery, cypherQuery2));
 
-				
-				Map<String, Object> paramMap = new HashMap<String, Object>();
-				paramMap.put("param1", "ParamValue1");
-
-				ResponseEntity<String> result = restTemplate.postForEntity("http://localhost:7474/db/data/transaction" + "/" + transactionId, "{'statements' : [ {'statement' : '" + cypherQuery + "' }]}" , String.class);
-				System.out.println("XXX result: " + result);
-				
-				restTemplate.postForEntity("http://localhost:7474/db/data/transaction" + "/" + transactionId + "/commit", "" , String.class);
-				
-				
-			}
+			neo4jTransactionalService.commitTransaction(transaction);
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
-			restTemplate.delete("http://localhost:7474/db/data/transaction" + "/" + transactionId);
+			
+			if(transaction != null)
+			{
+				neo4jTransactionalService.rollbackTransaction(transaction);
+			}
+			
+			return "NOT OK";
 		}
 		
-		return null;
+		return toReturn;
 /*
 		try {
 
@@ -170,5 +171,4 @@ public class RuleModuleRestController {
 	public @ResponseBody String test() {
 		return "OK";
 	}
-
 }

@@ -12,7 +12,7 @@ public class NEO4JObjectGenerator {
 		String queryAll = "";
 		
 		
-		for (int j = 0; j < 200; j++){
+		for (int j = 0; j < 20; j++){
 		
 			String node1 = "node1_" + randInt + "_" + j;
 			String node2 = "node2_" + randInt + "_" + j;

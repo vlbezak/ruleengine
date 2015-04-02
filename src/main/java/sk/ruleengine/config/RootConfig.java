@@ -39,6 +39,11 @@ public class RootConfig {
 	String ruleModuleRestUrl() {
 		return environment.getProperty("rulemodule.rulemodule1.uri");
 	}
+	
+	@Bean
+	String neo4jTransactionRestUrl() {
+		return environment.getProperty("neo4j.transaction.rest.url");
+	}
 
 	@Bean(name="moduleRestTemplate")
 	RestTemplate restTemplate() {
